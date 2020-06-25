@@ -31,6 +31,8 @@ class RandomWord extends StatefulWidget {
 
 class _RandomWordState extends State<RandomWord> {
   final List<WordPair> _suggestion = <WordPair>[];
+  //Set stores the word pairings that the user favorited. not allow duplicates
+  final _saved = Set<WordPair>();
   final TextStyle _biggerFont = const TextStyle(fontSize: 18.0);
   @override
   Widget build(BuildContext context) {
@@ -39,9 +41,38 @@ class _RandomWordState extends State<RandomWord> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Startup name gennerator"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved)
+        ],
       ),
       body: _buildSuggestion(),
     );
+  }
+
+  void _pushSaved(){
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context){
+          final tiles = _saved.map((WordPair pair){
+            return ListTile(
+              title: Text(pair.asPascalCase, style: _biggerFont,),
+            );
+          });
+          final divided = ListTile.divideTiles(
+              context: context,
+              tiles: tiles,
+          ).toList();
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Saved Suggestions'),
+            ),
+            body: ListView(children: divided,),
+          );
+        }
+      )
+    );
+
+
   }
 
   Widget _buildSuggestion(){
@@ -74,11 +105,24 @@ class _RandomWordState extends State<RandomWord> {
   }
 
   Widget _buildRow(WordPair pair){
+    final alreadySaved = _saved.contains(pair);
     return ListTile(
       title: Text(
         pair.asPascalCase,
         style: _biggerFont,
       ),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite :Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      onTap: (){
+        setState(() {
+          if(alreadySaved)
+            _saved.remove(pair);
+          else
+            _saved.add(pair);
+        });
+      },
     );
   }
 
