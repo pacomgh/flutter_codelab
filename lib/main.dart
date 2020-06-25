@@ -9,6 +9,7 @@ class MyApp extends StatelessWidget {
     //final wordPair = new WordPair.random();
     return MaterialApp(
       title: 'Welcome to Flutter',
+      theme: ThemeData.dark(),
       home: RandomWord()
       /*Scaffold(
         appBar: AppBar(
